@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  account-service:
+    build: ../hackathon-fiap-account-entry-service
+    container_name: account-service
+    init: true
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_PORT=3001
+      - DATABASE_PATH=./storage/database.sqlite
+      - DB_LOGGING=false
+      - CLASSIFIER_SERVICE_URL=http://classifier-service:3002
+      - CLASSIFIER_SERVICE_ANALYSE_ENDPOINT=/analyze
+    networks:
+      - hackathon-net
+
+  classifier-service:
+    build: ../hackathon-fiap-entry-rule-classifier
+    container_name: classifier-service
+    init: true
+    ports:
+      - "3002:3002"
+    environment:
+      - NODE_PORT=3002
+      - DATABASE_PATH=./storage/database.sqlite
+      - DB_LOGGING=false
+      - ACCOUNT_ENTRIES_SERVICE_URL=http://account-service:3001
+      - ACCOUNT_ENTRIES_ENDPOINT=/account-entries
+    networks:
+      - hackathon-net
+    depends_on:
+      - account-service
+
+networks:
+  hackathon-net:
+    driver: bridge
