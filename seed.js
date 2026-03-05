@@ -1,41 +1,69 @@
-const QUANTITY = 100;
+const QUANTITY = 20;
 
 const seed = async () => {
-  const rules = [
-    { agency: "0001", account: "123456", entry_name_pattern: "IFOOD", category: "FOOD" },
-    { agency: "0001", account: "123456", entry_name_pattern: "UBER", category: "TRANSPORT" },
-    { agency: "0001", account: "123456", entry_name_pattern: "SALARY", category: "INCOME" }
+  const agency = "0001";
+  const account = "123456";
+
+  const budgetItems = [
+    { category: "FOOD", amount: 1000.00 },
+    { category: "TRANSPORT", amount: 500.00 },
+    { category: "SERVICES", amount: 300.00 }
   ];
 
-  console.log("Setting up rules...");
-  for (const rule of rules) {
+  const rulePatterns = [
+    { pattern: "IFOOD", category: "FOOD" },
+    { pattern: "UBER", category: "TRANSPORT" },
+    { pattern: "NETFLIX", category: "SERVICES" },
+    { pattern: "AMAZON", category: "SERVICES" }
+  ];
+
+  for (const b of budgetItems) {
     try {
-      await fetch("http://localhost:3002/rules", {
+      const res = await fetch("http://localhost:3003/budgets", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(rule)
+        body: JSON.stringify({
+          agency: agency,
+          account: account,
+          category_name: b.category,
+          budget_amount: b.amount
+        })
       });
+      console.log(`[Budget] ${b.category}: ${res.status}`);
     } catch (err) {
-      console.error("Error setting rules");
+      console.error(`[Budget Error] ${b.category}: ${err.message}`);
+    }
+  }
+
+  for (const r of rulePatterns) {
+    try {
+      const res = await fetch("http://localhost:3002/rules", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          agency: agency,
+          account: account,
+          entry_name_pattern: r.pattern,
+          category: r.category
+        })
+      });
+      console.log(`[Rule] ${r.pattern}: ${res.status}`);
+    } catch (err) {
+      console.error(`[Rule Error] ${r.pattern}: ${err.message}`);
     }
   }
 
   const debitNames = ["IFOOD", "UBER", "NETFLIX", "AMAZON", "GAS STATION", "PHARMACY", "BAKERY"];
-  const creditNames = ["SALARY", "PIX RECEIVED", "REFUND"];
 
-  console.log("Generating entries...");
   for (let i = 1; i <= QUANTITY; i++) {
-    const isCredit = i % 5 === 0;
-    const list = isCredit ? creditNames : debitNames;
-    const selectedName = list[Math.floor(Math.random() * list.length)];
-
+    const selectedName = debitNames[Math.floor(Math.random() * debitNames.length)];
     const payload = {
       cpf: "12345678901",
-      agency: "0001",
-      account: "123456",
+      agency: agency,
+      account: account,
       entry_name: `${selectedName}`.substring(0, 20),
-      value: isCredit ? 2500.00 : parseFloat((Math.random() * 200 + 10).toFixed(2)),
-      entry_type: isCredit ? "CREDIT" : "DEBIT"
+      value: parseFloat((Math.random() * 200 + 10).toFixed(2)),
+      entry_type: "DEBIT"
     };
 
     try {
@@ -44,12 +72,27 @@ const seed = async () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
       });
-      console.log(`[${payload.entry_type}] ${payload.entry_name} - Status: ${res.status}`);
+      if (i % 20 === 0) console.log(`[Entries] Processed ${i}/${QUANTITY}`);
     } catch (err) {
-      console.error("Connection error");
+      console.error(`[Entry Error]: ${err.message}`);
     }
   }
-  console.log("Finish");
+
+  try {
+    const res = await fetch("http://localhost:3003/budget/refresh", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ agency, account })
+    });
+    console.log(`[Refresh] Status: ${res.status}`);
+  } catch (err) {
+    console.error(`[Refresh Error]: ${err.message}`);
+  }
+
+  console.log("Seed process completed");
 };
 
-seed();
+seed().catch(err => {
+  console.error("Critical Failure:", err);
+  process.exit(1);
+});
