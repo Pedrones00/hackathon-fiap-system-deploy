@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   account-service:
-    build: ../account-entry
+    build: ../hackathon-fiap-account-entry
     container_name: account-service
     init: true
     ports:
@@ -17,7 +17,7 @@ services:
       - hackathon-net
 
   classifier-service:
-    build: ../entry-rule-classifier
+    build: ../hackathon-fiap-entry-rule-classifier
     container_name: classifier-service
     init: true
     ports:
@@ -36,7 +36,7 @@ services:
       - account-service
     
   budget-service:
-    build: ../budget-service
+    build: ../hackathon-fiap-budget-service
     container_name: budget-service
     init: true
     ports:
