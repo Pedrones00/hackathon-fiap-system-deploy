@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   account-service:
-    build: ../hackathon-fiap-account-entry
+    build: ../hackathon-fiap-account-entry-service
     container_name: account-service
     init: true
     ports:
@@ -53,6 +53,26 @@ services:
       - hackathon-net
     depends_on:
       - classifier-service
+
+  ai-insight-service:
+    build: ../hackathon-fiap-ai-insight-service
+    container_name: insight-service
+    init: true
+    ports:
+      - "3004:3004"
+    environment:
+      - NODE_PORT=3004
+      - DATABASE_PATH=./storage/database.sqlite
+      - DB_LOGGING=false
+      - ACCOUNT_ENTRIES_SERVICE_URL=http://account-service:3001
+      - ACCOUNT_ENTRIES_ENDPOINT=/account-entries
+      - BUDGET_SERVICE_URL=http://budget-service:3003
+      - BUDGET_SERVICE_VERIFY_ENDPOINT=/budgets
+      - OPENAI_API_KEY=<YOUR_KEY>
+    networks:
+      - hackathon-net
+    depends_on:
+      - budget-service
 
 networks:
   hackathon-net:

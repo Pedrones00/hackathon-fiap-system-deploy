@@ -11,6 +11,7 @@ git clone https://github.com/Pedrones00/hackathon-fiap-system-deploy.git
 git clone https://github.com/Pedrones00/hackathon-fiap-account-entry-service.git
 git clone https://github.com/Pedrones00/hackathon-fiap-entry-rule-classifier.git
 git clone https://github.com/Pedrones00/hackathon-fiap-budget-service.git
+git clone https://github.com/Pedrones00/hackathon-fiap-ai-insight-service.git
 ```
 
 2) Adjust environment variables
