@@ -74,6 +74,24 @@ services:
     depends_on:
       - budget-service
 
+  front-end-service:
+    build: ../hackathon-fiap-front-end
+    container_name: front-end-service
+    init: true
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_ACCOUNT_ENTRIES_SERVICE_URL=http://account-service:3001
+      - NEXT_PUBLIC_BUDGET_SERVICE_URL=http://budget-service:3003
+      - NEXT_PUBLIC_CLASSIFIER_SERVICE_URL=http://classifier-service:3002
+      - NEXT_PUBLIC_AI_INSIGHT_SERVICE=http://insight-service:3004
+      - NEXT_PUBLIC_AGENCY=0001
+      - NEXT_PUBLIC_ACCOUNT=123456
+    networks:
+      - hackathon-net
+    depends_on:
+      - budget-service
+
 networks:
   hackathon-net:
     driver: bridge
