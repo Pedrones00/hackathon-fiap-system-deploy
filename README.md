@@ -12,6 +12,7 @@ git clone https://github.com/Pedrones00/hackathon-fiap-account-entry-service.git
 git clone https://github.com/Pedrones00/hackathon-fiap-entry-rule-classifier.git
 git clone https://github.com/Pedrones00/hackathon-fiap-budget-service.git
 git clone https://github.com/Pedrones00/hackathon-fiap-ai-insight-service.git
+git clone https://github.com/lcgds/hackathon-fiap-front-end.git
 ```
 
 2) Adjust environment variables
@@ -35,8 +36,10 @@ A helper script (`seed.js` in this repo) can populate the services with example 
 node seed.js
 ```
 
-The script will POST sample rules to port `3002` and entries to port `3001`, printing status messages as it runs.
-
+5) Acess front-end enviroment:
+```
+http://localhost:3000
+```
 
 Verification and logs
 
